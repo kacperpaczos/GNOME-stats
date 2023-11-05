@@ -1,0 +1,12 @@
+FROM node:lts-alpine as base
+WORKDIR /app
+COPY package*.json ./
+RUN npm install && npm cache clean --force
+ENV PATH=/usr/local/myapp/node_modules/.bin:$PATH
+
+FROM base as dev
+WORKDIR /app
+COPY . .
+RUN npm install
+EXPOSE 5137
+CMD ["npm", "run", "dev", "--host 0.0.0.0"]

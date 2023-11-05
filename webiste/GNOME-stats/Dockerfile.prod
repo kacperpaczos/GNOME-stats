@@ -1,0 +1,17 @@
+FROM node:lts-alpine as builder
+WORKDIR /app
+ENV PATH /app/node_modules/.bin:$PATH
+COPY package.json /app/package.json
+#COPY tsconfig.app.json ./app/tsconfig.app.json
+RUN npm install --silent && npm cache clean --force
+#RUN npm install @vue/cli@3.7.0 -g
+COPY . /app
+RUN npm run build
+
+# production stage
+FROM nginx:stable-alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+
